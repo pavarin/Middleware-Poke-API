@@ -1,12 +1,11 @@
 package com.pavarin.middlewarepokeapi.infrastructure.rest;
 
+import com.pavarin.middlewarepokeapi.application.exception.PokemonNotFoundException;
+import com.pavarin.middlewarepokeapi.application.usecase.ListPokemonAbilitiesSortedByNameUseCase;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.pavarin.middlewarepokeapi.application.usecase.GetPokemonAbilitiesUseCase;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
@@ -14,27 +13,22 @@ import java.util.Objects;
 @RequestMapping("/v1/pokemon")
 public class PokeApiController {
 
-    private final GetPokemonAbilitiesUseCase getPokemonAbilitiesUseCase;
+    private final ListPokemonAbilitiesSortedByNameUseCase listPokemonAbilitiesSortedByNameUseCase;
 
-    public PokeApiController(final GetPokemonAbilitiesUseCase getPokemonAbilitiesUseCase) {
-        this.getPokemonAbilitiesUseCase = Objects.requireNonNull(getPokemonAbilitiesUseCase);
+    public PokeApiController(final ListPokemonAbilitiesSortedByNameUseCase listPokemonAbilitiesSortedByNameUseCase) {
+        this.listPokemonAbilitiesSortedByNameUseCase = Objects.requireNonNull(listPokemonAbilitiesSortedByNameUseCase);
     }
 
     @GetMapping("/{name}/abilities")
-    public ResponseEntity<?> listAbilities(@PathVariable("name") String name) {
+    public Mono<ListPokemonAbilitiesSortedByNameUseCase.Output> listAbilities(@PathVariable("name") String name) {
 
-        try {
+        return listPokemonAbilitiesSortedByNameUseCase.execute(new ListPokemonAbilitiesSortedByNameUseCase.Input(name));
 
-            return ResponseEntity.ok()
-                    .body(getPokemonAbilitiesUseCase.execute(new GetPokemonAbilitiesUseCase.Input(name)));
+    }
 
-        } catch (Exception e) {
-
-            return ResponseEntity.internalServerError()
-                    .body(e.getMessage());
-
-        }
-
+    @ExceptionHandler(PokemonNotFoundException.class)
+    public ResponseEntity<String> handlePokemonNotFound(PokemonNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
 }
