@@ -32,7 +32,7 @@ public class PokeApiControllerTest {
 
     @Test
     @DisplayName("Deve retornar as habilidades de um pokemor ordenadas com sucesso!")
-    public void testListAbilities_Success() {
+    public void testListAbilitiesSuccess() {
 
         // Arrange
         String pokemonName = "pikachu";
@@ -60,7 +60,7 @@ public class PokeApiControllerTest {
 
     @Test
     @DisplayName("Deve retornar erro 404 em caso de passagem de um nome de pokemon inexistente!")
-    public void testListAbilities_PokemonNotFound() {
+    public void testListAbilitiesPokemonNotFound() {
 
         // Arrange
         String pokemonName = "unknown";
